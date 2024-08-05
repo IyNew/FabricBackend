@@ -20,3 +20,12 @@
 # Go workspace file
 go.work
 go.work.sum
+
+# install-fabirc.sh
+install-fabric.sh
+
+# fabric-samples
+fabric-samples/
+
+# sample dataset
+drp-client/ds1.csv

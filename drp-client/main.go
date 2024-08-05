@@ -4,27 +4,26 @@ import (
 	"log"
 	"net/http"
 	// "drp-client/handlers"
-	"encoding/json"
-	"bytes"
-	"context"
-	"crypto/x509"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"os"
-	"path"
-	"time"
+	// "encoding/json"
+	// "bytes"
+	// "context"
+	// "crypto/x509"
+	// "errors"
+	// "fmt"
+	// "os"
+	// "path"
+	// "time"
 
 	"github.com/IyNew/FabricBackend/drp-client/utils"
 
 	"github.com/gorilla/mux"
-	"github.com/hyperledger/fabric-gateway/pkg/client"
-	"github.com/hyperledger/fabric-gateway/pkg/identity"
-	"github.com/hyperledger/fabric-protos-go-apiv2/gateway"
+	// "github.com/hyperledger/fabric-gateway/pkg/client"
+	// "github.com/hyperledger/fabric-gateway/pkg/identity"
+	// "github.com/hyperledger/fabric-protos-go-apiv2/gateway"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/status"
+	// "google.golang.org/grpc"
+	// "google.golang.org/grpc/credentials"
+	// "google.golang.org/grpc/status"
 )
 
 const (
@@ -90,10 +89,10 @@ func main() {
 	r := mux.NewRouter()
 
 	// Define routes
-	r.HandleFunc("/api/hello", HelloHandler).Methods("GET")
-	r.HandleFunc("/api/users", GetUsers).Methods("GET")
-	r.HandleFunc("/api/users/{id}", GetUser).Methods("GET")
-	r.HandleFunc("/api/users", CreateUser).Methods("POST")
+	r.HandleFunc("/api/hello", utils.HelloHandler).Methods("GET")
+	r.HandleFunc("/api/users", utils.GetUsers).Methods("GET")
+	r.HandleFunc("/api/users/{id}", utils.GetUser).Methods("GET")
+	r.HandleFunc("/api/users", utils.CreateUser).Methods("POST")
 
 	// Start server
 	log.Println("Server listening on port 6999")
