@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/hyperledger/fabric-chaincode-go/v2/shim"
@@ -40,7 +41,7 @@ func TestCreateRecord(t *testing.T) {
 
 	stub.On("PutState", "drone1", mock.Anything).Return(nil)
 
-	err := scc.CreateRecord(ctx, "drone1", "10001", 100, "record1", "reserved1")
+	err := scc.CreateRecord(ctx, "drone1", "10001", strconv.Itoa(100), "record1", "reserved1")
 	assert.NoError(t, err)
 
 	// stub.AssertCalled(t, "PutState", "drone1", mock.Anything)

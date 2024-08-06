@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv" // Add this import statement
 
+	// Add this import statement
 	"github.com/hyperledger/fabric-chaincode-go/v2/shim"
 	"github.com/hyperledger/fabric-contract-api-go/v2/contractapi"
 )
@@ -24,7 +24,7 @@ type Record struct {
 	RecordID  string `json:"recordID"`
 	DroneID   string `json:"droneID"`
 	Zip       string `json:"zip"`
-	FlyTime   int64  `json:"flyTime"`
+	FlyTime   string `json:"flyTime"`
 	FlyRecord string `json:"flyRecord"`
 	Reserved  string `json:"reserved"`
 }
@@ -36,10 +36,10 @@ type PaginatedQueryResult struct {
 }
 
 // CreateRecord adds a new record to the world state with given details
-func (s *SimpleChaincode) CreateRecord(ctx contractapi.TransactionContextInterface, droneID string, zip string, flytime int64, flyrecord string, reserved string) error {
+func (s *SimpleChaincode) CreateRecord(ctx contractapi.TransactionContextInterface, droneID string, zip string, flytime string, flyrecord string, reserved string) error {
 
 	// the recordID is a combination of the droneID_flytime
-	recordID := droneID + "_" + strconv.FormatInt(flytime, 10)
+	recordID := droneID + "_" + flytime
 
 	// Check if the record already exists
 	exists, err := s.RecordExists(ctx, recordID)
@@ -69,12 +69,14 @@ func (s *SimpleChaincode) CreateRecord(ctx contractapi.TransactionContextInterfa
 // InitLedger adds a base set of records to the ledger
 func (s *SimpleChaincode) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	records := []Record{
-		{DroneID: "drone1", Zip: "10001", FlyTime: 100, FlyRecord: "record1", Reserved: "reserved1"},
-		{DroneID: "drone2", Zip: "10002", FlyTime: 200, FlyRecord: "record2", Reserved: "reserved2"},
-		{DroneID: "drone3", Zip: "10003", FlyTime: 300, FlyRecord: "record3", Reserved: "reserved3"},
-		{DroneID: "drone4", Zip: "10004", FlyTime: 400, FlyRecord: "record4", Reserved: "reserved4"},
-		{DroneID: "drone5", Zip: "10005", FlyTime: 500, FlyRecord: "record5", Reserved: "reserved5"},
+		{DroneID: "drone1", Zip: "10001", FlyTime: "100", FlyRecord: "record1", Reserved: "reserved1"},
+		{DroneID: "drone2", Zip: "10002", FlyTime: "200", FlyRecord: "record2", Reserved: "reserved2"},
+		{DroneID: "drone3", Zip: "10003", FlyTime: "300", FlyRecord: "record3", Reserved: "reserved3"},
+		{DroneID: "drone4", Zip: "10004", FlyTime: "400", FlyRecord: "record4", Reserved: "reserved4"},
+		{DroneID: "drone5", Zip: "10005", FlyTime: "500", FlyRecord: "record5", Reserved: "reserved5"},
 	}
+
+	// records, _ := importFromFile()
 
 	for _, record := range records {
 		err := s.CreateRecord(ctx, record.DroneID, record.Zip, record.FlyTime, record.FlyRecord, record.Reserved)
