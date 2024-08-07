@@ -10,6 +10,9 @@ import (
 	"sync"
 )
 
+const filePath = "./ds1.csv"
+const apiURL = "http://localhost:6999/api/record/create"
+
 type Record struct {
 	RecordID  string `json:"recordID"`
 	DroneID   string `json:"droneID"`
@@ -42,9 +45,6 @@ type RawRecord struct {
 	Batterylevel             string `json:"batterylevel"`
 	Crash                    string `json:"crash"`
 }
-
-const filePath = "./ds1.csv"
-const apiURL = "http://localhost:6999/api/record/create"
 
 func main() {
 	file, err := os.Open(filePath)

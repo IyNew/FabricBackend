@@ -105,10 +105,20 @@ func CreateRecord(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(newRecord)
 }
 
-func QueryRecordsWithSelector(w http.ResponseWriter, r *http.Request) {
+func TestQueryRecordsWithSelector(w http.ResponseWriter, r *http.Request) {
 	// params := mux.Vars(r)
 	selector := `{"selector":{"droneID":"blue"}, "use_index":["indexDroneTimeDoc","indexDroneTime"], "sort":[{"flyTime":"desc"}]}`
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(DecompressRecord(getRecordWithSelector(selector))))
+}
+
+// QueryRecordsWithSelectorJSON is a handler for querying records with selector in JSON format
+// The selector is passed as a URL parameter
+func QueryRecordsWithSelectorJSON(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	// selector params["slectorBody"] in JSON format
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(DecompressRecord(getRecordWithSelector(params["selectorString"]))))
 }

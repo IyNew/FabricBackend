@@ -5,13 +5,13 @@ CONTRACT_SRC = $(REPO_SRC)/drp-storage/chaincode-go
 CLIENT_SRC = $(REPO_SRC)/drp-client
 TEST_CONTRACT_SRC = $(REPO_SRC)/fabric-samples/asset-transfer-basic/chaincode-go
 
-prerequisites: check-prerequisites
-	@echo "Installing prerequisites"
+check-prerequisites: echo_prerequisites
+	@echo "Check prerequisites"
 	chmod +x pre-requisites.sh
 	./pre-requisites.sh
 
 
-check-prerequisites:
+echo_prerequisites:
 	@echo "Make sure you have the following installed:"
 	@echo "1. git"
 	@echo "2. curl"
