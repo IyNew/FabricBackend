@@ -10,6 +10,10 @@ A hyperledger fabric based blockchain backend storage
 > This may fail at contract installation in rare occasions, simply trying the command again should resolve the problem.
 5. Use `make api_server` to bring up the api service
 
+## Initialize the ledger with csv data
+Navigate to [FabricBackend/data-import-helper](./data-import-helper) and use `go run import_file.go` to put the data in ds1.csv to the ledger.
+> This helper relies on the api server.
+
 ## To bring it down
 1. Use `make down` to turn the network down
 2. Use `make clean` to clean up the downloaded repos and docker images.

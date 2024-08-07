@@ -208,7 +208,7 @@ func createDroneRecord(droneID string, zip string, flytime string, flyrecord str
 	if err != nil {
 		// panic(fmt.Errorf("failed to submit transaction: %w", err))
 		fmt.Printf("failed to submit transaction: %v\n", err)
-		fmt.Printf("Please check if the record %s, %s, %s already exists\n", droneID, flytime, ConvertToRFC3339(flytime))
+		// fmt.Printf("Please check if the record %s, %s, %s already exists\n", droneID, flytime, ConvertToRFC3339(flytime))
 		return
 	}
 
@@ -238,10 +238,36 @@ func createDroneRecordAsync(droneID string, zip string, flytime string, flyrecor
 	// fmt.Printf("*** Transaction committed successfully\n")
 }
 
-func getAllDroneRecords() string {
+func getAllRecords() string {
 	// fmt.Println("\n--> Evaluate Transaction: GetAllRecords, function returns all the current records on the ledger")
 
 	evaluateResult, err := ClientContract.EvaluateTransaction("GetAllRecords")
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+	result := formatJSON(evaluateResult)
+
+	// fmt.Printf("*** Result:%s\n", result)
+	return result
+}
+
+func getAllRecordsForOneDrone(droneID string) string {
+	// fmt.Println("\n--> Evaluate Transaction: GetAllRecords, function returns all the current records on the ledger")
+
+	evaluateResult, err := ClientContract.EvaluateTransaction("QueryRecordsByDroneID", droneID)
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+	result := formatJSON(evaluateResult)
+
+	// fmt.Printf("*** Result:%s\n", result)
+	return result
+}
+
+func getRecordWithSelector(selector string) string {
+	// fmt.Println("\n--> Evaluate Transaction: GetAllRecords, function returns all the current records on the ledger")
+
+	evaluateResult, err := ClientContract.EvaluateTransaction("QueryRecords", selector)
 	if err != nil {
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
 	}

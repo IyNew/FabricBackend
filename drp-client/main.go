@@ -34,14 +34,17 @@ func main() {
 	defer utils.GatewayConn.Close()
 
 	// initialize the ledger with data from the CSV file
-	utils.ImportFromFile("./ds1.csv")
+	// utils.ImportFromFile("./ds1.csv")
 	// utils.GetAllRecords()
 
 	// Define routes
 	r.HandleFunc("/api/hello", utils.HelloHandler).Methods("GET")
 	// r.HandleFunc("/api/test", utils.TestAPI).Methods("GET")
-	r.HandleFunc("/api/init", utils.InitLedger)
-	r.HandleFunc("/api/records", utils.GetAllRecords).Methods("GET")
+	// r.HandleFunc("/api/init", utils.InitLedger)
+	r.HandleFunc("/api/all", utils.GetAllRecords).Methods("GET")
+	r.HandleFunc("/api/record/{droneID}", utils.GetAllRecordsForOneDrone).Methods("GET")
+	r.HandleFunc("/api/record/create", utils.CreateRecord).Methods("POST")
+	r.HandleFunc("/api/query/", utils.QueryRecordsWithSelector).Methods("GET")
 	// r.HandleFunc("/api/users", utils.GetUsers).Methods("GET")
 	// r.HandleFunc("/api/users/{id}", utils.GetUser).Methods("GET")
 	// r.HandleFunc("/api/users", utils.CreateUser).Methods("POST")

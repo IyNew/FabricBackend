@@ -32,7 +32,7 @@ network_up:
 	cd $(FABRIC_TEST_NETWORK_SRC) && ./network.sh up createChannel
 
 network_up_couchdb:
-	cd $(FABRIC_TEST_NETWORK_SRC) && ./network.sh up createChannel -ca -s couchdb
+	cd $(FABRIC_TEST_NETWORK_SRC) && ./network.sh up createChannel -s couchdb
 
 # Ignore the couchdb setting for now, check the performance later
 drp_deploy: down network_up
@@ -44,7 +44,7 @@ test_basic_deploy: down network_up
 drp_couchdb_deploy: down network_up_couchdb
 	cd $(FABRIC_TEST_NETWORK_SRC) && ./network.sh deployCC -ccn basic -ccp $(CONTRACT_SRC) -ccl go 
 
-api_server:
+api_server: 
 	cd $(CLIENT_SRC) && go run main.go
 
 down:

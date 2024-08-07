@@ -1,12 +1,8 @@
 package utils
 
 import (
-	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -74,18 +70,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 // 	fmt.Println("Test getAllAssets API completed.")
 // }
 
-type Record struct {
-	DroneID   string `json:"droneID"`
-	Zip       string `json:"zip"`
-	FlyTime   string `json:"flyTime"`
-	FlyRecord string `json:"flyRecord"`
-	Reserved  string `json:"reserved"`
-}
-
 func GetAllRecords(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(getAllDroneRecords()))
+	w.Write([]byte(DecompressRecord(getAllRecords())))
 	// json.NewEncoder(w).Encode(records)
 }
 
@@ -95,43 +83,32 @@ func InitLedger(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Ledger initialized"))
 }
 
-func ImportFromFile(filePath string) {
-	// Open the CSV file
-	csvFile, err := os.Open("./ds1.csv")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	defer csvFile.Close()
+func GetAllRecordsForOneDrone(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(DecompressRecord(getAllRecordsForOneDrone(params["droneID"]))))
+}
 
-	// Parse the CSV file
-	reader := csv.NewReader(csvFile)
-	reader.TrimLeadingSpace = true
-	records, err := reader.ReadAll()
-	if err != nil {
-		fmt.Println("Error:", err)
+func CreateRecord(w http.ResponseWriter, r *http.Request) {
+	// Post request body
+	var rawRecord RawRecord
+	if err := json.NewDecoder(r.Body).Decode(&rawRecord); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// var droneRecords []Record
+	newRecord := CompressRecord(&rawRecord)
+	createDroneRecord(newRecord.DroneID, newRecord.Zip, newRecord.FlyTime, newRecord.FlyRecord, newRecord.Reserved)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	// json.NewEncoder(w).Encode(newRecord)
+}
 
-	// Convert the CSV records
-	for i, record := range records {
-		if i == 0 {
-			continue
-		}
-		// concat record with "," to get the flyRecord
-		flyRecord := strings.Join(record, ",")
-		encryptedFlyRecord, _ := Encrypt(flyRecord)
-
-		droneRecord := Record{
-			DroneID:   record[0],
-			Zip:       record[2],
-			FlyTime:   ConvertToUnixTime(record[3]),
-			FlyRecord: encryptedFlyRecord,
-			Reserved:  "",
-		}
-		fmt.Println(i, droneRecord)
-		createDroneRecord(droneRecord.DroneID, droneRecord.Zip, droneRecord.FlyTime, droneRecord.FlyRecord, droneRecord.Reserved)
-	}
+func QueryRecordsWithSelector(w http.ResponseWriter, r *http.Request) {
+	// params := mux.Vars(r)
+	selector := `{"selector":{"droneID":"blue"}, "use_index":["indexDroneTimeDoc","indexDroneTime"], "sort":[{"flyTime":"desc"}]}`
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(DecompressRecord(getRecordWithSelector(selector))))
 }

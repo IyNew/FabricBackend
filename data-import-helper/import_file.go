@@ -2,17 +2,12 @@ package main
 
 import (
 	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
-	"io"
+	"net/http"
 	"os"
-	"strconv"
-	"strings"
-	"time"
+	"sync"
 )
 
 type Record struct {
@@ -24,131 +19,106 @@ type Record struct {
 	Reserved  string `json:"reserved"`
 }
 
+type RawRecord struct {
+	Drone                    string `json:"drone"`
+	Story                    string `json:"story"`
+	Zip                      string `json:"zip"`
+	Datetime                 string `json:"datetime"`
+	Temperature              string `json:"temperature"`
+	Wind                     string `json:"wind"`
+	Gust                     string `json:"gust"`
+	Timesincelastmaintenance string `json:"timesincelastmaintenance"`
+	Flighthours              string `json:"flighthours"`
+	Pitch                    string `json:"pitch"`
+	Roll                     string `json:"roll"`
+	Yaw                      string `json:"yaw"`
+	Vibex                    string `json:"vibex"`
+	Vibey                    string `json:"vibey"`
+	Vibez                    string `json:"vibez"`
+	Nsat                     string `json:"nsat"`
+	Noise                    string `json:"noise"`
+	Currentslope             string `json:"currentslope"`
+	Brownout                 string `json:"brownout"`
+	Batterylevel             string `json:"batterylevel"`
+	Crash                    string `json:"crash"`
+}
+
 const filePath = "./ds1.csv"
+const apiURL = "http://localhost:6999/api/record/create"
 
-func importFromFile() ([]Record, error) {
-
-	// Open the CSV file
-	csvFile, err := os.Open(filePath)
+func main() {
+	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return nil, err
+		fmt.Println("Error opening file: ", err)
+		return
 	}
-	defer csvFile.Close()
+	defer file.Close()
 
-	// Parse the CSV file
-	reader := csv.NewReader(csvFile)
+	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
 	records, err := reader.ReadAll()
 	if err != nil {
-		fmt.Println("Error:", err)
-		return nil, err
+		fmt.Println("Error reading file: ", err)
+		return
 	}
 
-	var droneRecords []Record
+	// concurrency control
+	var wg sync.WaitGroup
+	concurrency := 5
+	semaphore := make(chan struct{}, concurrency)
 
 	for i, record := range records {
+		// skip the first line
 		if i == 0 {
 			continue
 		}
-		// concat record with "," to get the flyRecord
-		flyRecord := strings.Join(record, ",")
-		encryptedFlyRecord, _ := Encrypt(flyRecord)
+		wg.Add(1)
+		semaphore <- struct{}{}
 
-		droneRecord := Record{
-			DroneID:   record[0],
-			Zip:       record[2],
-			FlyTime:   ConvertToUnixTime(record[3]),
-			FlyRecord: encryptedFlyRecord,
-			Reserved:  "",
-		}
-		droneRecords = append(droneRecords, droneRecord)
-		// fmt.Println(i, droneRecord)
-		// createDroneRecordAsync(droneRecord.DroneID, droneRecord.Zip, droneRecord.FlyTime, droneRecord.FlyRecord, droneRecord.Reserved)
+		go func(record []string) {
+			defer wg.Done()
+			defer func() {
+				<-semaphore
+			}()
+			fmt.Println(record)
+			// recordLine := strings.Split(record, ",")
+			// parse the recordLine to RawRecord JSON
+			rawRecord := RawRecord{
+				Drone:                    record[0],
+				Story:                    record[1],
+				Zip:                      record[2],
+				Datetime:                 record[3],
+				Temperature:              record[4],
+				Wind:                     record[5],
+				Gust:                     record[6],
+				Timesincelastmaintenance: record[7],
+				Flighthours:              record[8],
+				Pitch:                    record[9],
+				Roll:                     record[10],
+				Yaw:                      record[11],
+				Vibex:                    record[12],
+				Vibey:                    record[13],
+				Vibez:                    record[14],
+				Nsat:                     record[15],
+				Noise:                    record[16],
+				Currentslope:             record[17],
+				Brownout:                 record[18],
+				Batterylevel:             record[19],
+				Crash:                    record[20],
+			}
+
+			rawRecordsJSON, _ := json.Marshal(rawRecord)
+			resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(rawRecordsJSON))
+			if err != nil {
+				fmt.Println("Error posting record: ", err)
+				return
+			}
+			defer resp.Body.Close()
+
+			fmt.Println("Record posted successfully")
+		}(record)
+		// POST the rawRecordsJSON to the server
+		// POSTRequest(rawRecordsJSON)
 	}
-	return droneRecords, err
-}
-
-func ConvertToRFC3339(unixtime string) string {
-	unixtimeInt, _ := strconv.ParseInt(unixtime, 10, 64)
-	t := time.Unix(unixtimeInt, 0)
-	return t.Format(time.RFC3339)
-}
-
-func ConvertToUnixTime(datetime string) string {
-	t, _ := time.Parse(time.RFC3339, datetime)
-	return strconv.FormatInt(t.Unix(), 10)
-}
-
-const key = "thisis32bitlongpassphraseimusing"
-
-// For Testing purposes
-func Encrypt(plaintext string) (string, error) {
-	return encryptWithKey(plaintext, key)
-}
-
-func Decrypt(ciphertext string) (string, error) {
-	return decryptWithKey(ciphertext, key)
-}
-
-func PKCS7Padding(data []byte, blockSize int) []byte {
-	padding := blockSize - len(data)%blockSize
-	padText := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(data, padText...)
-}
-
-func PKCS7UnPadding(data []byte) []byte {
-	length := len(data)
-	unpadding := int(data[length-1])
-	return data[:(length - unpadding)]
-}
-
-func encryptWithKey(plainText, key string) (string, error) {
-	block, err := aes.NewCipher([]byte(key))
-	if err != nil {
-		return "", err
-	}
-
-	data := PKCS7Padding([]byte(plainText), block.BlockSize())
-	ciphertext := make([]byte, block.BlockSize()+len(data))
-	iv := ciphertext[:block.BlockSize()]
-
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return "", err
-	}
-
-	mode := cipher.NewCBCEncrypter(block, iv)
-	mode.CryptBlocks(ciphertext[block.BlockSize():], data)
-
-	return base64.StdEncoding.EncodeToString(ciphertext), nil
-}
-
-func decryptWithKey(cryptoText, key string) (string, error) {
-	ciphertext, _ := base64.StdEncoding.DecodeString(cryptoText)
-
-	block, err := aes.NewCipher([]byte(key))
-	if err != nil {
-		return "", err
-	}
-
-	if len(ciphertext) < block.BlockSize() {
-		return "", fmt.Errorf("ciphertext too short")
-	}
-
-	iv := ciphertext[:block.BlockSize()]
-	ciphertext = ciphertext[block.BlockSize():]
-
-	mode := cipher.NewCBCDecrypter(block, iv)
-	mode.CryptBlocks(ciphertext, ciphertext)
-
-	ciphertext = PKCS7UnPadding(ciphertext)
-	return string(ciphertext), nil
-}
-
-func main() {
-	records, _ := importFromFile()
-
-	for _, record := range records {
-		fmt.Println(record)
-	}
+	wg.Wait()
 }
