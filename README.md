@@ -1,15 +1,36 @@
 # FabricBackend
-A hyperledger fabric based blockchain backend storage
+A hyperledger fabric based blockchain backend storage.
 
-## To make it work
+## Dependencies
+
++ Golang 1.22.5+
+  + In linux, please consult [go version manager](https://github.com/moovweb/gvm) to manage go version. 
++ jq
++ Docker
+  + docker-compose (for older version docker)
+  + In linux, add current user to the docker group to avoid privilege issue: ```sudo usermod -a -G docker $USER```
+
+
+### On Ubuntu:
+```
+sudo apt-get install git curl jq -y
+```
+Start docker with 
+```
+sudo systemctl start docker
+```
+
+### On MacOS
+```
+brew install git curl jq golang@1.22.5
+```
+Start docker with [Docker Desktop](https://www.docker.com/).
+
+
+## To make the server work
 1. Clone this repo to the destination of your choice, make sure you have make and docker/docker compose installed.
 > The following commands are assumed to initiated from the FabricBackend/ directory.
-2. Run `make prerequisites` to check prerequisites. 
-> Install the required package with
-> `sudo apt-get install git curl jq golang -y`. The GO version needs to be go1.22.5 or above.
-> 
-> Also, add current user to the docker group to avoid privilege issue:
-> `sudo usermod -a -G docker $USER`
+2. Run `make check-prerequisite` to check prerequisites. 
 3. Run `make install` to install the necessary components, including fabric, docker images, and chaincode.
 4. Use `make drp_couchdb_deploy` to bring up the test network and deploy the contract.
 > This may fail at contract installation in rare occasions, simply trying the command again should resolve the problem.

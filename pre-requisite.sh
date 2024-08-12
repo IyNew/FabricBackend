@@ -10,38 +10,50 @@
 # Add your user to the Docker group.
 # sudo usermod -a -G docker $USER
 
+if [ -x "$(command -v git --version)" ]; then
+    # jq --version
+    echo "Passed: git" $(git --version)
+else
+    echo "Error: git is not installed"
+    # stop the script
+    exit 1
+fi
+
+if [ -x "$(command -v curl --version)" ]; then
+    # jq --version
+    echo "Passed: curl"
+else
+    echo "Error: curl is not installed"
+    # stop the script
+    exit 1
+fi
+
+
 # Check version numbers  
-if [ -x "$(command -v docker)" ]; then
-    docker --version
+if [ -x "$(command -v docker --version)" ]; then
+    echo "Passed: Docker" $(docker --version)
 else
-    echo "error: docker is not installed"
+    echo "Error: docker is not installed"
+    exit 1
 fi
 
-# check if docker needs sudo
-if docker run hello-world; then
-    echo "Docker does not require sudo"
+
+if [ -x "$(command -v jq --version)" ]; then
+    # jq --version
+    echo "Passed: jq" $(jq --version)
 else
-    echo "Docker requires sudo"
-    echo "Add your user to the Docker group to run Docker without sudo."
+    echo "Error: jq is not installed"
+    exit 1
 fi
 
-if [ -x "$(command -v docker-compose)" ]; then
-    docker-compose --version
-else
-    echo "error: docker-compose is not installed"
-fi
-
-if [ -x "$(jq --version)" ]; then
-    jq --version
-else
-    echo "error: jq is not installed"
-    echco ""
-fi
 
 # get the go version number, and check if it is 1.22.5 or higher
 if go version | grep -q "go1.22.[5-9]\|go1.2[3-9][0-9]\|go[2-9][0-9]\|go[1-9][0-9][0-9]"; then
-    echo "Go version satisfies the requirement"
-    echo "use 'make install' and 'make deploy' to start the network"
+    echo "Passed: Go" $(go version)
 else
     echo "error: Go version is not 1.22.5 or higher"
+    exit 1
 fi
+
+
+
