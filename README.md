@@ -22,7 +22,7 @@ sudo systemctl start docker
 
 ### On MacOS
 ```
-brew install git curl jq golang@1.22.5
+brew install git curl jq go
 ```
 Start docker with [Docker Desktop](https://www.docker.com/).
 
