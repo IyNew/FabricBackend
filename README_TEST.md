@@ -17,7 +17,7 @@ Query existing records
 curl tjws-06.cse.nd.edu:6999/api/record/all
 ```
 
-Create a new record with current time stamp
+Create a new record
 ```json
 {
     "drone": "grey",
