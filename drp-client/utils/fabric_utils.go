@@ -287,3 +287,14 @@ func initDroneRecords() {
 
 	// fmt.Printf("*** Transaction committed successfully\n")
 }
+
+func helloFabric() string {
+	// fmt.Println("\n--> Evaluate Transaction: Hello, function returns a greeting message to check if the chaincode is alive")
+	evaluateResult, err := ClientContract.EvaluateTransaction("Hello")
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+	result := string(evaluateResult)
+
+	return result
+}

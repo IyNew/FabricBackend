@@ -72,6 +72,9 @@ func main() {
 		if i == 0 {
 			continue
 		}
+		if i > 10 {
+			break
+		}
 		wg.Add(1)
 		semaphore <- struct{}{}
 

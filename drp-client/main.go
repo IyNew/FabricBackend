@@ -38,7 +38,7 @@ func main() {
 	// utils.GetAllRecords()
 
 	// Define routes
-	r.HandleFunc("/api/hello", utils.HelloHandler).Methods("GET")
+	// r.HandleFunc("/api/hello", utils.HelloHandler).Methods("GET")
 	// r.HandleFunc("/api/test", utils.TestAPI).Methods("GET")
 	// r.HandleFunc("/api/init", utils.InitLedger)
 	r.HandleFunc("/api/record/all", utils.GetAllRecords).Methods("GET")
@@ -49,7 +49,9 @@ func main() {
 	r.HandleFunc("/api/record/testSelector", utils.TestQueryRecordsWithSelector).Methods("GET")
 
 	// api for querying records with selector, with string selector in JSON format
-	r.HandleFunc("/api/record/{selectorString}", utils.QueryRecordsWithSelectorJSON).Methods("GET")
+	// r.HandleFunc("/api/record/{selectorString}", utils.QueryRecordsWithSelectorJSON).Methods("GET")
+
+	r.HandleFunc("/api/hello", utils.HelloFabric).Methods("GET")
 
 	// r.HandleFunc("/api/users", utils.GetUsers).Methods("GET")
 	// r.HandleFunc("/api/users/{id}", utils.GetUser).Methods("GET")

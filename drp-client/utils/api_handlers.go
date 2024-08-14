@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 
 	"github.com/gorilla/mux"
 )
@@ -19,10 +20,10 @@ var users = []User{
 	{ID: "2", Name: "Jane Doe"},
 }
 
-func HelloHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Hello, world!"))
-}
+// func HelloHandler(w http.ResponseWriter, r *http.Request) {
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Write([]byte("Hello, world!"))
+// }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -97,6 +98,8 @@ func CreateRecord(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	// print the rawRecord
+	fmt.Println(rawRecord)
 
 	newRecord := CompressRecord(&rawRecord)
 	createDroneRecord(newRecord.DroneID, newRecord.Zip, newRecord.FlyTime, newRecord.FlyRecord, newRecord.Reserved)
@@ -121,4 +124,10 @@ func QueryRecordsWithSelectorJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(DecompressRecord(getRecordWithSelector(params["selectorString"]))))
+}
+
+func HelloFabric(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(helloFabric()))
 }

@@ -79,3 +79,5 @@ Return records with selector specified by {selectorString} -->
 |dev-peer.org2|Docker|-
 |CouchDB0|Docker|5984|
 |CouchDB1|Docker|7984|
+
+For live demo, please check the [instructions](README_TEST.md).

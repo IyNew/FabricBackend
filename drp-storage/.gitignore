@@ -30,3 +30,5 @@
 *.tmp
 *.bak
 *.swp
+
+nohup.out

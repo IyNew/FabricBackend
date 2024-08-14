@@ -39,6 +39,11 @@ type PaginatedQueryResult struct {
 	Bookmark            string   `json:"bookmark"`
 }
 
+// Hello returns a greeting message to check if the chaincode is alive
+func (s *SimpleChaincode) Hello(ctx contractapi.TransactionContextInterface) string {
+	return "Hello from fabric, the service is running!"
+}
+
 // ReadRecord returns the record with the given recordID
 func (s *SimpleChaincode) ReadRecord(ctx contractapi.TransactionContextInterface, recordID string) (*Record, error) {
 	recordJSON, err := ctx.GetStub().GetState(recordID)
