@@ -17,6 +17,12 @@ Query existing records
 curl tjws-06.cse.nd.edu:6999/api/record/all
 ```
 
+Query the records with drone id ```grey``` (feel free to change)
+```bash
+curl http://tjws-06.cse.nd.edu:6999/api/record/grey 
+```
+
+
 Create a new record
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"drone": "grey","story": "1","zip": "96701","datetime": "2024-01-02T00:00:00Z","temperature": "24.8","wind": "3.01","gust": "9.3","timesincelastmaintenance": "16.9192835242178","flighthours": "29.3651318764408","pitch": "1.46646019661782","roll": "1.68349152692755","yaw": "1.13800845548443","vibex": "0.257336027891003","vibey": "1.69496992420949","vibez": "0.811888101171306","nsat": "4","noise": "35","currentslope": "0.005","brownout": "FALSE","batterylevel": "0.8","crash": "FALSE"}' http://tjws-06.cse.nd.edu:6999/api/record/create
@@ -47,11 +53,5 @@ This command will create the following record. Feel free to change the parameter
     "crash": "FALSE"
 }
 ```
-
-
-
-Query the records with drone id ```grey``` (feel free to change)
-```bash
-curl http://tjws-06.cse.nd.edu:6999/api/record/grey 
-```
-
+Created new record will be encrypted and committed to the blockchain server through consensus of the test network.
+![screen_shot](./livedemo_screenshot.jpg)
