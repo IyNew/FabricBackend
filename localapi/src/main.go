@@ -22,27 +22,10 @@ type Options struct {
 	Port int `help:"Port to listen on" short:"p" default:"8080"`
 }
 
-// GreetingOutput represents the greeting operation response.
-type GreetingOutput struct {
-	Body struct {
-		Message string `json:"message" example:"Hello, world!" doc:"Greeting message"`
-	}
-}
-
-// ReviewInput represents the review operation request.
-type ReviewInput struct {
-	Body struct {
-		Author  string `json:"author" maxLength:"10" doc:"Author of the review"`
-		Rating  int    `json:"rating" minimum:"1" maximum:"5" doc:"Rating from 1 to 5"`
-		Message string `json:"message,omitempty" maxLength:"100" doc:"Review message"`
-	}
-}
-
 type CertificateInput struct {
 	Body struct {
-		utils.Certificate 
+		utils.Certificate
 	}
-
 }
 
 type ReceviedCertificateResponse struct {
@@ -102,22 +85,6 @@ func main() {
 		router := chi.NewMux()
 		api := humachi.New(router, huma.DefaultConfig("My API", "1.0.0"))
 
-		// Register GET /greeting/{name}
-		huma.Register(api, huma.Operation{
-			OperationID: "get-greeting",
-			Method:      http.MethodGet,
-			Path:        "/greeting/{name}",
-			Summary:     "Get a greeting",
-			Description: "Get a greeting for a person by name.",
-			Tags:        []string{"Greetings"},
-		}, func(ctx context.Context, input *struct {
-			Name string `path:"name" maxLength:"30" example:"world" doc:"Name to greet"`
-		}) (*GreetingOutput, error) {
-			resp := &GreetingOutput{}
-			resp.Body.Message = fmt.Sprintf("Hello, %s!", input.Name)
-			return resp, nil
-		})
-
 		// Register POST /certificates/create
 		huma.Register(api, huma.Operation{
 			OperationID:   "post-certificate",
@@ -128,7 +95,7 @@ func main() {
 			Description:   "Post a certificate to the server.",
 			DefaultStatus: http.StatusCreated,
 		}, func(ctx context.Context, input *CertificateInput) (*ReceviedCertificateResponse, error) {
-			
+
 			log.Printf("Received certificate with PilotID: %v", input.Body.PilotID)
 			cert_db_obj, err := utils.GetCertificateDBObject(&input.Body.Certificate)
 			if err != nil {
